@@ -268,33 +268,7 @@ function printCertificate(){
  const p=db.people.find(x=>x.id===$('certPerson').value);
  if(!p)return alert('Selecione um participante.');
  const w=window.open('','_blank');if(!w)return alert('Permita pop-ups para imprimir.');
- w.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Certificado demonstrativo</title></head><body style="font:20px Arial;text-align:center;padding:90px;border:15px solid #0b7358"><h1>Prêmio de Educação Ambiental</h1><p>CERTIFICADO — DEMONSTRAÇÃO</p><h2>'+esc(p.nome)+'</h2><p>'+esc($('certType').value)+'</p><p>'+esc(school(p.schoolId))+'</p><small>Sem validade oficial • Joinville 2027</small>
-<style>.eco-install-panel{margin-top:20px;padding:18px;border:1px solid #c9e3d7;border-radius:12px;background:#f1f9f4}body.dark-mode .eco-install-panel{background:#173b32;color:#e6f7ee}</style>
-<script>
-let ecoInstallPrompt=null;
-window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();ecoInstallPrompt=event;ecoUpdateInstallStatus()});
-window.addEventListener('appinstalled',()=>{ecoInstallPrompt=null;ecoUpdateInstallStatus('Aplicativo instalado com sucesso.')});
-function ecoUpdateInstallStatus(message){
- const status=document.getElementById('ecoInstallStatus');
- if(!status)return;
- status.textContent=message||(window.matchMedia('(display-mode: standalone)').matches?'Você já está usando o aplicativo instalado.':ecoInstallPrompt?'Instalação disponível neste navegador.':'Se o botão não abrir a instalação, use o menu do navegador: Instalar aplicativo ou Adicionar à tela inicial.');
-}
-async function ecoInstallApp(){
- if(window.matchMedia('(display-mode: standalone)').matches){ecoUpdateInstallStatus('O aplicativo já está aberto no modo instalado.');return}
- if(ecoInstallPrompt){
-  const prompt=ecoInstallPrompt;ecoInstallPrompt=null;
-  await prompt.prompt();
-  const result=await prompt.userChoice;
-  ecoUpdateInstallStatus(result.outcome==='accepted'?'Instalação solicitada.':'Instalação cancelada. Você também pode usar o menu do navegador.');
- }else{
-  ecoUpdateInstallStatus('No Chrome ou Edge, abra o menu ⋮ e selecione Instalar aplicativo. No iPhone/iPad, use Compartilhar → Adicionar à Tela de Início. A instalação exige HTTPS.');
- }
-}
-if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){
- window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(error=>console.warn('PWA:',error)));
-}
-</script>
-</body></html>');
+ w.document.write('<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Certificado demonstrativo</title></head><body style="font:20px Arial;text-align:center;padding:90px;border:15px solid #0b7358"><h1>Prêmio de Educação Ambiental</h1><p>CERTIFICADO — DEMONSTRAÇÃO</p><h2>'+esc(p.nome)+'</h2><p>'+esc($('certType').value)+'</p><p>'+esc(school(p.schoolId))+'</p><small>Sem validade oficial • Joinville 2027</small></body></html>');
  w.document.close();w.focus();setTimeout(()=>w.print(),300);
 }
 (function(){
@@ -503,5 +477,31 @@ loadUsers();$('authOverlay').classList.add('hidden');renderPublic();
  }
  prepare();
 })();
+</script>
+
+<style>.eco-install-panel{margin-top:20px;padding:18px;border:1px solid #c9e3d7;border-radius:12px;background:#f1f9f4}body.dark-mode .eco-install-panel{background:#173b32;color:#e6f7ee}</style>
+<script>
+let ecoInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();ecoInstallPrompt=event;ecoUpdateInstallStatus()});
+window.addEventListener('appinstalled',()=>{ecoInstallPrompt=null;ecoUpdateInstallStatus('Aplicativo instalado com sucesso.')});
+function ecoUpdateInstallStatus(message){
+ const status=document.getElementById('ecoInstallStatus');
+ if(!status)return;
+ status.textContent=message||(window.matchMedia('(display-mode: standalone)').matches?'Você já está usando o aplicativo instalado.':ecoInstallPrompt?'Instalação disponível neste navegador.':'Se o botão não abrir a instalação, use o menu do navegador: Instalar aplicativo ou Adicionar à tela inicial.');
+}
+async function ecoInstallApp(){
+ if(window.matchMedia('(display-mode: standalone)').matches){ecoUpdateInstallStatus('O aplicativo já está aberto no modo instalado.');return}
+ if(ecoInstallPrompt){
+  const prompt=ecoInstallPrompt;ecoInstallPrompt=null;
+  await prompt.prompt();
+  const result=await prompt.userChoice;
+  ecoUpdateInstallStatus(result.outcome==='accepted'?'Instalação solicitada.':'Instalação cancelada. Você também pode usar o menu do navegador.');
+ }else{
+  ecoUpdateInstallStatus('No Chrome ou Edge, abra o menu ⋮ e selecione Instalar aplicativo. No iPhone/iPad, use Compartilhar → Adicionar à Tela de Início. A instalação exige HTTPS.');
+ }
+}
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='localhost')){
+ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(error=>console.warn('PWA:',error)));
+}
 </script>
 </body></html>
