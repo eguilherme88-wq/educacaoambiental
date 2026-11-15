@@ -126,7 +126,7 @@ function render(){
  if(current==='certificados')h=panel('Emissão de certificados demonstrativos','<div class="notice">Certificados de demonstração, sem validade institucional. A emissão oficial dependerá da homologação e da autorização de uso da identidade da Secretaria e patrocinadora.</div><div class="form"><label>Participante<select id="certPerson">'+opts(db.people)+'</select></label><label>Categoria<select id="certType"><option>Participação nas atividades</option><option>Professor destaque (demonstração)</option><option>Aluno destaque (demonstração)</option></select></label></div><button class="btn" onclick="printCertificate()">Visualizar / imprimir certificado</button>');
  if(current==='auditoria')h=panel('Auditoria e proteção de dados','<div class="notice">Protótipo sem autenticação, sem controle de permissões e sem sincronização. Não é adequado para armazenar dados pessoais reais ou operar uma competição oficial. Implementar autenticação, LGPD, trilhas de auditoria protegidas e pontuação validada no servidor antes do lançamento.</div>'+table(['Data/hora','Ação'],db.logs.map(x=>[esc(x.at),esc(x.action)])));
  if(current==='cronograma')h=panel('Cronograma editável','<form class="form" onsubmit="addStep(event)"><label>Mês<input type="month" name="date" required></label><label>Etapa<input name="title" required maxlength="120"></label><label>Responsável<input name="owner" required maxlength="100"></label><div style="align-self:end"><button class="btn">Adicionar etapa</button></div></form>'+table(['Mês','Etapa','Responsável','Status','Ações'],db.timeline.map(t=>['<input type="month" value="'+esc(t.date)+'" onchange="editStep(\''+t.id+'\',\'date\',this.value)">','<input value="'+esc(t.title)+'" onchange="editStep(\''+t.id+'\',\'title\',this.value)">','<input value="'+esc(t.owner)+'" onchange="editStep(\''+t.id+'\',\'owner\',this.value)">','<select onchange="editStep(\''+t.id+'\',\'status\',this.value)">'+['Planejada','Em andamento','Concluída','Adiada'].map(s=>'<option '+(t.status===s?'selected':'')+'>'+s+'</option>').join('')+'</select>','<button onclick="deleteStep(\''+t.id+'\')">Excluir</button>'])))+panel('Linha do tempo profissional','<div class="timeline">'+[...db.timeline].sort((a,b)=>a.date.localeCompare(b.date)).map(t=>'<article><b>'+esc(t.date)+'</b><h3>'+esc(t.title)+'</h3><p class="muted">'+esc(t.owner)+'</p><span class="badge">'+esc(t.status)+'</span></article>').join('')+'</div>');
- if(current==='gestao')h=panel('Organograma interativo','<div class="org">'+[['Proponente','Desenvolvimento, operação e suporte técnico da plataforma.'],['Secretaria de Educação','Parceria institucional proposta, articulação e validação pedagógica.'],['Escolas','Coordenação de projetos e participação escolar.'],['Professores','Mediação pedagógica e orientação das atividades.'],['Alunos','Aprendizagem e participação nos desafios.'],['Comissão','Análise independente e homologação conforme regulamento.'],['Essencis','Patrocinadora indicada pelo proponente; uso da marca sujeito a autorização.']].map((x,i)=>'<button onclick="document.getElementById(\'orgInfo\').textContent='+JSON.stringify(x[1]).replaceAll('"','&quot;')+'">'+x[0]+'</button>').join('')+'</div><p id="orgInfo" class="metric" style="margin-top:12px">Selecione um participante para visualizar suas responsabilidades.</p>')+panel('Dados e backups','<div class="actions"><button class="btn" onclick="backup()">Exportar backup JSON</button><label class="btn alt" style="cursor:pointer">Importar backup JSON<input type="file" accept="application/json" onchange="restore(event)" hidden></label><button class="btn alt" onclick="exportCSV()">Exportar escolas CSV</button><button class="btn warn" onclick="resetAll()">Restaurar dados de demonstração</button></div><p class="sectionnote">Backup completo com imagens incorporadas, fotos de perfil, banners, publicações, inscrições, permissões e configurações. Para abrir em outro navegador, exporte o JSON e importe-o na mesma versão da plataforma. Faça uma cópia antes de restaurar.</p>')+panel('Origem da base de escolas','<p>Pré-cadastro elaborado a partir de relação municipal publicada em 2023. Não representa inscrições nem lista atualizada e homologada para 2027.</p><p><a target="_blank" rel="noopener" href="'+SOURCE+'">Consultar fonte municipal</a></p>');
+ if(current==='gestao')h=panel('Organograma interativo','<div class="org">'+[['Proponente','Desenvolvimento, operação e suporte técnico da plataforma.'],['Secretaria de Educação','Parceria institucional proposta, articulação e validação pedagógica.'],['Escolas','Coordenação de projetos e participação escolar.'],['Professores','Mediação pedagógica e orientação das atividades.'],['Alunos','Aprendizagem e participação nos desafios.'],['Comissão','Análise independente e homologação conforme regulamento.'],['Essencis','Patrocinadora indicada pelo proponente; uso da marca sujeito a autorização.']].map((x,i)=>'<button onclick="document.getElementById(\'orgInfo\').textContent='+JSON.stringify(x[1]).replaceAll('"','&quot;')+'">'+x[0]+'</button>').join('')+'</div><p id="orgInfo" class="metric" style="margin-top:12px">Selecione um participante para visualizar suas responsabilidades.</p>')+panel('Dados e backups','<div class="actions"><button class="btn" onclick="backup()">Exportar backup JSON</button><label class="btn alt" style="cursor:pointer">Importar backup JSON<input type="file" accept="application/json" onchange="restore(event)" hidden></label><button class="btn alt" onclick="exportCSV()">Exportar escolas CSV</button><button class="btn warn" onclick="resetAll()">Restaurar dados de demonstração</button></div><p class="sectionnote">Backup JSON com imagens, fotos de perfil, banners, publicações, inscrições, permissões e configurações. O catálogo de imagens é restaurado no IndexedDB para evitar o limite do localStorage. Para abrir em outro navegador, exporte o JSON e importe-o na mesma versão da plataforma. Faça uma cópia antes de restaurar.</p>')+panel('Origem da base de escolas','<p>Pré-cadastro elaborado a partir de relação municipal publicada em 2023. Não representa inscrições nem lista atualizada e homologada para 2027.</p><p><a target="_blank" rel="noopener" href="'+SOURCE+'">Consultar fonte municipal</a></p>');
  if(current==='gestao'&&sessionUser.role==='Administrador')h+=ecoBannerAdmin();
  $('app').innerHTML=h;if(current==='inscricoes'||current==='escolas')drawSchools();
 }
@@ -169,51 +169,98 @@ async function backup(){
     imagens.push(data);
    }catch(e){indisponiveis.push(url);}
   }
+  try{imagens.push(...await ecoGetImageCatalog())}catch(e){console.warn('Catálogo IndexedDB indisponível:',e)}
   const payload={formato:'premio-educacao-ambiental-backup',versao:3,criadoEm:new Date().toISOString(),dados,imagens:[...new Set(imagens)],imagensExternasNaoIncluidas:indisponiveis};
   download('premio-ambiental-backup-com-imagens-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify(payload),'application/json');
   alert('Backup gerado com '+payload.imagens.length+' imagens incorporadas e os dados locais.'+(indisponiveis.length?' Atenção: '+indisponiveis.length+' imagem(ns) externa(s) não puderam ser incorporadas devido às restrições do servidor.':''));
  }catch(err){alert('Falha ao gerar backup: '+err.message)}
  finally{if(btn)btn.disabled=false;}
 }
-function restore(e){
+
+// Catálogo de imagens do backup em IndexedDB, separado do localStorage.
+const ECO_IMAGE_DB='eco_premio_imagens_backup';
+function ecoImageStore(mode='readonly'){
+ return new Promise((resolve,reject)=>{
+  const request=indexedDB.open(ECO_IMAGE_DB,1);
+  request.onupgradeneeded=()=>{if(!request.result.objectStoreNames.contains('catalogos'))request.result.createObjectStore('catalogos')};
+  request.onerror=()=>reject(request.error);
+  request.onsuccess=()=>{
+   const dbi=request.result;
+   try{
+    const tx=dbi.transaction('catalogos',mode),store=tx.objectStore('catalogos');
+    resolve({dbi,tx,store});
+   }catch(err){dbi.close();reject(err)}
+  };
+ });
+}
+async function ecoGetImageCatalog(){
+ const {dbi,tx,store}=await ecoImageStore();
+ return new Promise((resolve,reject)=>{
+  const req=store.get('imagens');
+  req.onsuccess=()=>resolve(req.result||[]);
+  req.onerror=()=>reject(req.error);
+  tx.oncomplete=()=>dbi.close();
+  tx.onerror=()=>{dbi.close();reject(tx.error)};
+ });
+}
+async function ecoPutImageCatalog(imagens){
+ const {dbi,tx,store}=await ecoImageStore('readwrite');
+ return new Promise((resolve,reject)=>{
+  store.put(imagens,'imagens');
+  tx.oncomplete=()=>{dbi.close();resolve()};
+  tx.onerror=()=>{dbi.close();reject(tx.error||new Error('Não foi possível gravar imagens no IndexedDB'))};
+  tx.onabort=()=>{dbi.close();reject(tx.error||new Error('Armazenamento de imagens interrompido'))};
+ });
+}
+async function restore(e){
  if(!sessionUser||sessionUser.role!=='Administrador'){alert('Somente o administrador pode restaurar backups.');return;}
  const file=e.target.files&&e.target.files[0];if(!file)return;
- const reader=new FileReader();
- reader.onload=()=>{
-  try{
-   const payload=JSON.parse(reader.result);
-   let imported,entries;
-   if(payload.formato==='premio-educacao-ambiental-backup'&&[2,3].includes(payload.versao)&&payload.dados&&typeof payload.dados==='object'&&!Array.isArray(payload.dados)){
-    entries=payload.dados;
-    imported=JSON.parse(entries.eco_ambiental_v1);
-    if(payload.versao===3){
-     if(!Array.isArray(payload.imagens)||!payload.imagens.every(v=>typeof v==='string'&&/^data:image\/(?:png|jpeg|jpg|webp|gif);base64,/.test(v)))throw Error('Catálogo de imagens inválido');
-     // O catálogo é guardado para consulta e recuperação posterior.
-     // As imagens de cadastros e banners já são restauradas nos respectivos dados.
-     entries.eco_backup_images_v3=JSON.stringify(payload.imagens);
-    }
-   }else{
-    imported=payload;entries={eco_ambiental_v1:JSON.stringify(payload)};
+ const control=e.target;control.disabled=true;
+ try{
+  const payload=JSON.parse(await file.text());
+  let imported,entries,imagens=null;
+  if(payload.formato==='premio-educacao-ambiental-backup'&&[2,3].includes(payload.versao)&&payload.dados&&typeof payload.dados==='object'&&!Array.isArray(payload.dados)){
+   entries={...payload.dados};
+   imported=JSON.parse(entries.eco_ambiental_v1);
+   if(payload.versao===3){
+    if(!Array.isArray(payload.imagens)||!payload.imagens.every(v=>typeof v==='string'&&/^data:image\/(?:png|jpeg|jpg|webp|gif);base64,/.test(v)))throw Error('Catálogo de imagens inválido.');
+    imagens=payload.imagens;
    }
-   if(!imported||!Array.isArray(imported.schools)||!Array.isArray(imported.people)||!Array.isArray(imported.projects)||!Array.isArray(imported.timeline))throw Error('Estrutura de dados inválida.');
-   if(!Object.keys(entries).every(k=>k.startsWith('eco_')&&typeof entries[k]==='string'))throw Error('Chaves de armazenamento inválidas.');
-   if(!confirm('Restaurar o backup neste navegador? Os dados atuais serão substituídos. Faça uma exportação de segurança antes.'))return;
-   const previous={};
-   for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('eco_'))previous[k]=localStorage.getItem(k);}
+  }else{
+   imported=payload;entries={eco_ambiental_v1:JSON.stringify(payload)};
+  }
+  // Compatibilidade com backups antigos que incluíam o catálogo no localStorage.
+  if(typeof entries.eco_backup_images_v3==='string'){
+   if(imagens===null)imagens=JSON.parse(entries.eco_backup_images_v3);
+   delete entries.eco_backup_images_v3;
+  }
+  if(!imported||!Array.isArray(imported.schools)||!Array.isArray(imported.people)||!Array.isArray(imported.projects)||!Array.isArray(imported.timeline))throw Error('Estrutura de dados inválida.');
+  if(!Object.keys(entries).every(k=>k.startsWith('eco_')&&typeof entries[k]==='string'))throw Error('Chaves de armazenamento inválidas.');
+  if(!confirm('Restaurar o backup neste navegador? Os dados atuais serão substituídos. Faça uma exportação de segurança antes.'))return;
+  const previous={};
+  for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('eco_'))previous[k]=localStorage.getItem(k);}
+  let oldImages=null,imagesWritten=false;
+  try{
+   if(imagens!==null){
+    oldImages=await ecoGetImageCatalog();
+    await ecoPutImageCatalog(imagens);
+    imagesWritten=true;
+   }
+   for(const k of Object.keys(previous))localStorage.removeItem(k);
+   for(const [k,v] of Object.entries(entries))localStorage.setItem(k,v);
+  }catch(err){
    try{
-    for(const k of Object.keys(previous))localStorage.removeItem(k);
-    for(const [k,v] of Object.entries(entries))localStorage.setItem(k,v);
-   }catch(err){
     for(const k of Object.keys(entries))localStorage.removeItem(k);
     for(const [k,v] of Object.entries(previous))localStorage.setItem(k,v);
-    throw err;
-   }
-   alert('Backup restaurado, incluindo imagens salvas nos cadastros e banners. A página será recarregada.');
-   location.reload();
-  }catch(err){alert('Não foi possível importar o backup: '+err.message);}
-  finally{e.target.value='';}
- };
- reader.readAsText(file);
+   }catch(rollbackErr){alert('Atenção: não foi possível recuperar todos os dados locais. Preserve seu JSON de backup.');}
+   if(imagesWritten)try{await ecoPutImageCatalog(oldImages)}catch(_){}
+   throw err;
+  }
+  alert('Backup restaurado com sucesso! As imagens do catálogo foram armazenadas no IndexedDB. A página será recarregada.');
+  location.reload();
+ }catch(err){
+  alert('Não foi possível importar o backup: '+err.message+'. Preserve o arquivo JSON. Se o erro persistir, verifique o espaço disponível no navegador.');
+ }finally{control.disabled=false;control.value='';}
 }
 function exportCSV(){let csv='Escola;Situação;Origem\n'+db.schools.map(s=>[s.nome,s.situacao,s.origem].map(x=>'"'+String(x||'').replaceAll('"','""')+'"').join(';')).join('\n');download('escolas-joinville.csv','\ufeff'+csv,'text/csv;charset=utf-8')}
 function resetAll(){if(!mayEdit('gestao')){alert('Perfil sem permissão de edição.');return;}if(confirm('Apagar todos os dados de demonstração e restaurar a base inicial?')){db=defaults();save('Base restaurada')}}
