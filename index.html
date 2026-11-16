@@ -428,12 +428,13 @@ let publicData;try{publicData=JSON.parse(localStorage.getItem(PUBLIC_KEY))||stru
 function publicSave(){try{localStorage.setItem(PUBLIC_KEY,JSON.stringify(publicData));renderPublic();render()}catch(e){alert('Armazenamento cheio. Remova algumas fotos ou faça um backup.')}}
 function publicRank(){return db.schools.filter(s=>s.situacao==='Inscrita').map(s=>({...s,score:points(s.id)})).filter(s=>s.score>0).sort((a,b)=>b.score-a.score).slice(0,5)}
 function ecoShowPublicQR(){
- const url=String(publicData.siteUrl||'').trim();
+ const base=String(publicData.siteUrl||'').trim();
+ const url=/^https:\/\//i.test(base)?base.split('#')[0]+'#cadastro':base;
  if(!/^https:\/\//i.test(url)){alert('O administrador ainda não definiu o endereço HTTPS do QR Code em Página inicial / Publicações.');return;}
  const overlay=document.createElement('div');overlay.className='eco-qr-overlay';overlay.setAttribute('role','dialog');overlay.setAttribute('aria-modal','true');overlay.setAttribute('aria-label','QR Code da plataforma');
  const card=document.createElement('div');card.className='eco-qr-dialog';
- const title=document.createElement('h2');title.textContent='QR Code da plataforma';card.appendChild(title);
- const img=document.createElement('img');img.alt='QR Code para acessar o endereço configurado';img.width=240;img.height=240;img.src='https://api.qrserver.com/v1/create-qr-code/?size=240x240&data='+encodeURIComponent(url);card.appendChild(img);
+ const title=document.createElement('h2');title.textContent='Cadastre-se pelo celular';card.appendChild(title);
+ const img=document.createElement('img');img.alt='QR Code para abrir diretamente o cadastro pelo celular';img.width=240;img.height=240;img.src='https://api.qrserver.com/v1/create-qr-code/?size=240x240&data='+encodeURIComponent(url);card.appendChild(img);
  const info=document.createElement('p');info.textContent=url;info.style.overflowWrap='anywhere';card.appendChild(info);
  const close=document.createElement('button');close.type='button';close.className='btn';close.textContent='Fechar';close.onclick=()=>overlay.remove();card.appendChild(close);
  overlay.appendChild(card);overlay.onclick=e=>{if(e.target===overlay)overlay.remove()};document.body.appendChild(overlay);close.focus();
@@ -444,7 +445,7 @@ function renderPublic(){
  const tiles=(items)=>items.length?items.map(x=>'<article class="phcard">'+(x.src?'<img class="phphoto" src="'+x.src+'" alt="Imagem da publicação">':'')+(x.title?'<h3>'+esc(x.title)+'</h3>':'')+(x.body?'<p>'+esc(x.body)+'</p>':'')+'</article>').join(''):'<article class="phcard"><p>Novidades serão publicadas em breve.</p></article>';
  const link=String(publicData.siteUrl||'').trim();
  const qr=link&&/^https:\/\//i.test(link)?'<img alt="QR Code para acesso pelo celular" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(link)+'"><small>Aponte a câmera do celular</small>':'<div style="border:2px dashed #bfd9c9;padding:17px 5px;border-radius:9px;font-size:12px">QR Code disponível após configurar o endereço público HTTPS</div><small>Configure em Página inicial / Publicações</small>';
- root.innerHTML='<div class="phbar"><div class="phbrand">♻ Prêmio de Educação Ambiental<small>Joinville • Edição 2027</small></div><div class="eco-public-actions"><button class="phenter eco-qr-btn" onclick="ecoShowPublicQR()">▦ Visualizar QR Code</button><button class="phenter" onclick="enterPlatform()">Acessar plataforma →</button><button class="phenter eco-refresh-btn" onclick="location.reload()">↻ Atualizar</button></div></div>'+
+ root.innerHTML='<div class="phbar"><div class="phbrand">♻ Prêmio de Educação Ambiental<small>Joinville • Edição 2027</small></div><div class="eco-public-actions"><button class="phenter eco-qr-btn" onclick="ecoShowPublicQR()">▦ Cadastre-se pelo celular</button><button class="phenter" onclick="enterPlatform()">Acessar plataforma →</button></div></div>'+
  '<section class="phhero"><div class="phwrap phhero-flex"><div><span class="phtag">Educação ambiental • Resíduos industriais</span><h1>'+esc(publicData.headline)+'</h1><p>'+esc(publicData.subtitle)+'</p><button class="phenter" style="background:white;color:#075b47;margin-top:12px" onclick="openSchoolPerformance()">📊 Acompanhe o desempenho de sua escola →</button></div></div></section>'+
  '<section class="phsection" style="background:#eaf3ee"><div class="phwrap"><h2>Notícias e avisos</h2><div class="phgrid">'+tiles(publicData.notices)+'</div></div></section>'+
  '<section class="phsection"><div class="phwrap"><h2>Escolas e projetos em destaque</h2><div class="phgrid">'+tiles(publicData.highlights)+'</div></div></section>'+
@@ -514,7 +515,7 @@ function publicAdd(e,key){
 }
 const originalPublicRender=render;render=function(){if(current==='publicacao'){const previous=current;current='dashboard';originalPublicRender();current=previous;$('heading').textContent='Página inicial / Publicações';$('app').innerHTML=publicEditor();$('nav').querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.textContent.includes('Página inicial / Publicações')))}else originalPublicRender();renderPublic()};
 const oldGo=go;go=function(module){if(module==='publicacao'){current=module;render();return}oldGo(module)};
-loadUsers();$('authOverlay').classList.add('hidden');renderPublic();
+loadUsers();$('authOverlay').classList.add('hidden');renderPublic();if(location.hash==='#cadastro'){enterPlatform();authView('register');}
 
 </script><style id="portal-carrosseis-style">
 #publicHome .phcarousel{position:relative;display:flex;align-items:center;gap:10px;min-width:0}
